@@ -1,0 +1,70 @@
+---
+# tasks file for postfixadmin
+#postfixadmin用のDBとユーザを作成
+- name: create db for pma
+  mysql_db:
+    name: postfix
+    state: present
+    login_user: root
+    login_password: "{{ root_password }}"
+
+- name: create postfix user
+  mysql_user:
+    name: postfix
+    host: localhost
+    password: "{{ postfix_password }}"
+    priv: postfix.*:all
+    state: present
+    login_user: root
+    login_password: "{{ root_password }}"
+
+- name: pma confirm
+  stat: 
+    path: /usr/share/postfixadmin
+  register: result_posad
+
+- name: deploy pma
+  unarchive:
+    src: "../files/postfixadmin-3.2.4.tar.gz"
+    dest: /usr/share/
+    owner: apache
+    group: apache
+    mode: 0770
+  when: not result_posad.stat.exists
+
+- name: rename postfixadmin
+  shell: mv postfixadmin-postfixadmin-3.2.4 postfixadmin
+    chdir=/usr/share/
+  when: not result_posad.stat.exists
+
+- name: create template
+  file:
+    path: /usr/share/postfixadmin/templates_c
+    state: directory
+    owner: apache
+    group: apache
+    mode: 0755
+
+- name: replace config.inc.php
+  template:
+    src: "../templates/{{ item }}"
+    dest: "/usr/share/postfixadmin/{{ item }}"
+    owner: apache
+    group: apache
+    mode: 0664
+    backup: yes
+  with_items:
+    - config.local.php
+    - config.inc.php
+
+- name: chmod pma1
+  shell: chgrp -R apache /usr/share/postfixadmin
+
+- name: chmod pma2
+  shell: chmod -R 770 /usr/share/postfixadmin
+
+- name: chmod pma3
+  shell: chmod 755 /usr/share/postfixadmin/templates_c
+
+- name: chmod pma4
+  shell: chown -R apache:apache /usr/share/postfixadmin/templates_c

@@ -1,0 +1,3 @@
+---
+# vars file for logwatch
+dest_mail: root@localhost

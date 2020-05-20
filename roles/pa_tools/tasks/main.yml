@@ -1,0 +1,25 @@
+---
+# tasks file for pa_tools
+#- name: put cli tools
+#  copy:
+#    src: ../files/{{ item }}
+#    dest: /usr/share/postfixadmin/scripts/
+#    owner: apache
+#    group: apache
+#    mode: 0770
+#    backup: yes
+#  with_items:
+#    - postfixadmin-cli
+#    - postfixadmin-cli.php
+
+- name: put shell tools
+  copy:
+    src: ../files/{{ item }}
+    dest: /usr/local/bin/
+    owner: root
+    group: root
+    mode: 0755
+    backup: yes
+  with_items:
+    - mail_add_prod.sh
+    - mail_delete_prod.sh

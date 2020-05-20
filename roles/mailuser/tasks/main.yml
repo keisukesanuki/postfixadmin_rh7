@@ -1,0 +1,21 @@
+---
+# tasks file for mailuser
+- name: vmailuser-add
+  user:
+    state: present
+    name: vmail
+    comment: "Virtual mailbox"
+    system: yes
+    group: mail
+    home: /var/vmail
+    shell: /sbin/nologin
+    uid: 1500
+
+#メール用ユーザのディレクトリ作成
+- name: create-maildir
+  file:
+    path: /var/vmail
+    state: directory
+    owner: vmail
+    group: mail
+    mode: 0770

@@ -1,0 +1,47 @@
+---
+# tasks file for dovecot_conf
+- name: install packages
+  yum:
+    name:
+      - cyrus-sasl-sql
+      - cyrus-sasl-plain
+      - cyrus-sasl-md5
+      - cyrus-sasl-gssapi
+#      - cyrus-sasl-scram
+      - cyrus-sasl
+      - cyrus-sasl-plain
+      - dovecot-mysql
+      - dovecot
+      - postfix
+      - MySQL-python
+
+- name: put conf.d conf
+  template:
+    src: ../templates/{{ item }}
+    dest: /etc/dovecot/conf.d/
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
+  with_items:
+    - "10-auth.conf"
+    - "10-mail.conf"
+    - "10-master.conf"
+    - "10-ssl.conf"
+
+- name: put conf 
+  template:
+    src: ../templates/{{ item }}
+    dest: /etc/dovecot/
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
+  with_items:
+    - "dovecot-sql.conf.ext"
+
+- name: restart dovecot
+  service:
+    name: dovecot
+    state: restarted
+    enabled: yes

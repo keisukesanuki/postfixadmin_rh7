@@ -1,0 +1,39 @@
+---
+# tasks file for monitor
+- name: unzip monitor scripts
+  unarchive:
+    src: ../files/CloudWatchMonitoringScripts-1.2.2.zip
+    dest: /usr/local/src/
+    owner: root
+    group: root
+    
+- name: install deps
+  yum:
+    name:
+      - perl-Switch
+      - perl-DateTime
+      - perl-Sys-Syslog
+      - perl-LWP-Protocol-https
+      - perl-Digest-SHA
+#      - perl-DateTime
+#      - perl-CPAN
+#      - perl-Net-SSLeay
+#      - perl-IO-Socket-SSL
+#      - perl-Digest-SHA
+#      - gcc
+#      - "perl(Switch)"
+#      - "perl(Sys::Syslog)"
+#      - "perl(YAML)"
+#      - "perl(LWP::Protocol::https)"
+
+- name: set crontab
+  cron:
+    user: "{{ item.user }}"
+    name: "{{ item.name }}"
+    minute: "{{ item.minute }}"
+    hour: "{{ item.hour }}"
+    day: "{{ item.day }}"
+    job: "{{ item.job }}"
+    state: present
+  with_items:
+    - { user: 'root', name: 'cloudwatch monitor script', minute: "*/1", hour: "*", day: "*", job: '/usr/local/src/aws-scripts-mon/mon-put-instance-data.pl --mem-util --mem-used --mem-avail --swap-util --swap-used --disk-space-util --disk-path=/ --from-cron' }

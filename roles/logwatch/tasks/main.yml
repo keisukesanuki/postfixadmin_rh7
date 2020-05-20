@@ -1,0 +1,15 @@
+---
+# tasks file for logwatch
+- name: install logwatch
+  yum:
+    name:
+      - logwatch
+
+- name: put conf
+  template:
+    src: ../templates/logwatch.conf
+    dest: /usr/share/logwatch/default.conf/logwatch.conf
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
